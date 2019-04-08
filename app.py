@@ -22,9 +22,9 @@ app = Flask(__name__)
 # Model saved with Keras model.save()
 MODEL_PATH = 'models/trained_model.h5'
 
-#Load your trained model
+# Load your trained model
 model = load_model(MODEL_PATH)
-#model._make_predict_function()          # Necessary to make everything ready to run on the GPU ahead of time
+# model._make_predict_function()          # Necessary to make everything ready to run on the GPU ahead of time
 print('Model loaded. Start serving...')
 
 # You can also use pretrained model from Keras
@@ -35,13 +35,13 @@ print('Model loaded. Start serving...')
 
 
 def model_predict(img_path, model):
-    img = image.load_img(img_path, target_size=(64, 64)) #target_size must agree with what the trained model expects!!
+    # target_size must agree with what the trained model expects!!
+    img = image.load_img(img_path, target_size=(64, 64))
 
     # Preprocessing the image
     img = image.img_to_array(img)
     img = np.expand_dims(img, axis=0)
 
-   
     preds = model.predict(img)
     return preds
 
@@ -66,22 +66,26 @@ def upload():
 
         # Make prediction
         preds = model_predict(file_path, model)
-        os.remove(file_path)#removes file from the server after prediction has been returned
+        print(preds)
+        # removes file from the server after prediction has been returned
+        os.remove(file_path)
 
-        # Arrange the correct return according to the model. 
-		# In this model 1 is Pneumonia and 0 is Normal.
+        # Arrange the correct return according to the model.
+        # In this model 1 is Pneumonia and 0 is Normal.
         str1 = 'Pneumonia'
         str2 = 'Normal'
+        print(preds)
+
         if preds == 1:
             return str1
         else:
             return str2
     return None
 
-    #this section is used by gunicorn to serve the app on Heroku
+    # this section is used by gunicorn to serve the app on Heroku
 if __name__ == '__main__':
-        app.run()
-    #uncomment this section to serve the app locally with gevent at:  http://localhost:5000
-    # Serve the app with gevent 
+    app.run()
+    # uncomment this section to serve the app locally with gevent at:  http://localhost:5000
+    # Serve the app with gevent
     #http_server = WSGIServer(('', 5000), app)
-    #http_server.serve_forever()
+    # http_server.serve_forever()
